@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique de Thés</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Georgia', 'Times New Roman', serif; 
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8dfd0 100%);
+            padding: 20px; 
+            color: #4a3c2e; 
+        }
+        h1 { 
+            color: #5d4e37; 
+            margin-bottom: 25px; 
+            font-size: 2.2em; 
+            font-weight: 400;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #8b7355;
+            padding-bottom: 10px;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: #fefdfb; 
+            padding: 35px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(93, 78, 55, 0.15);
+            border: 1px solid #d4c4a8;
+        }
+        .message { padding: 14px 22px; margin-bottom: 22px; border-radius: 6px; font-family: system-ui, sans-serif; }
+        .message.success { background: #e8f5e9; color: #2e7d32; border-left: 4px solid #66bb6a; }
+        .message.error { background: #ffebee; color: #c62828; border-left: 4px solid #ef5350; }
+        .search-container { 
+            margin-bottom: 28px; 
+            padding: 22px; 
+            background: linear-gradient(to right, #f9f6f0, #f0ebe3);
+            border-radius: 8px;
+            border: 1px solid #d4c4a8;
+        }
+        .search-container form { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        input[type="text"], select { 
+            padding: 11px 15px; 
+            border: 2px solid #d4c4a8; 
+            border-radius: 5px; 
+            font-size: 14px; 
+            flex: 1; 
+            min-width: 180px;
+            background: #fefdfb;
+            font-family: system-ui, sans-serif;
+        }
+        input[type="text"]:focus, select:focus { 
+            outline: none; 
+            border-color: #8b7355; 
+            box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+        }
+        .btn { 
+            padding: 11px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            text-decoration: none; 
+            font-size: 14px; 
+            transition: all 0.3s; 
+            display: inline-block;
+            font-family: system-ui, sans-serif;
+            font-weight: 500;
+        }
+        .btn-primary { background: #6b5d4f; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-primary:hover { background: #5d4e37; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .btn-warning { background: #d4a574; color: #4a3c2e; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-warning:hover { background: #c49564; transform: translateY(-1px); }
+        .btn-danger { background: #b8705e; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-danger:hover { background: #a5604e; transform: translateY(-1px); }
+        .btn-success { background: #7a9d54; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-success:hover { background: #6a8d44; transform: translateY(-1px); }
+        table { width: 100%; border-collapse: collapse; margin: 22px 0; }
+        th, td { padding: 13px; text-align: left; border-bottom: 1px solid #e8dfd0; }
+        th { 
+            background: linear-gradient(to bottom, #6b5d4f, #5d4e37);
+            color: #fefdfb; 
+            font-weight: 600; 
+            position: sticky; 
+            top: 0;
+            font-family: system-ui, sans-serif;
+        }
+        th a { color: #fefdfb; text-decoration: none; display: block; }
+        th a:hover { opacity: 0.9; }
+        tr:hover { background: #faf7f2; }
+        td { font-size: 14px; color: #4a3c2e; }
+        .pagination { display: flex; gap: 6px; margin: 22px 0; flex-wrap: wrap; }
+        .pagination a, .pagination span { 
+            padding: 9px 14px; 
+            border: 1px solid #d4c4a8; 
+            border-radius: 5px; 
+            text-decoration: none; 
+            color: #5d4e37;
+            background: #fefdfb;
+            font-family: system-ui, sans-serif;
+        }
+        .pagination a:hover { background: #f9f6f0; border-color: #8b7355; }
+        .pagination .active { background: #6b5d4f; color: white; border-color: #6b5d4f; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Boutique de Thés</h1>
+    
+    <!-- Messages flash -->
+    <div th:if="${message}" class="message success" th:text="${message}"></div>
+    <div th:if="${error}" class="message error" th:text="${error}"></div>
+    
+    <!-- Formulaire de recherche et filtres -->
+    <div class="search-container">
+        <form method="get" action="/">
+            <input type="text" name="recherche" placeholder="Rechercher par nom..." 
+                   th:value="${recherche}" />
+            
+            <select name="typeThe">
+                <option value="">Tous les types</option>
+                <option th:each="type : ${typesThe}" 
+                        th:value="${type}" 
+                        th:text="${type}"
+                        th:selected="${type == typeTheFiltre}"></option>
+            </select>
+            
+            <input type="hidden" name="sortBy" th:value="${sortBy}" />
+            <input type="hidden" name="direction" th:value="${direction}" />
+            
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            <a href="/" class="btn btn-warning">Réinitialiser</a>
+            <a href="/nouveau" class="btn btn-success">Ajouter un thé</a>
+            <a th:href="@{/export-csv(recherche=${recherche}, typeThe=${typeTheFiltre})}" 
+               class="btn btn-primary">Exporter CSV</a>
+        </form>
+    </div>
+    
+    <!-- Informations de pagination -->
+    <div th:if="${totalItems > 0}">
+        <p>Total: <strong th:text="${totalItems}"></strong> produits - 
+           Page <strong th:text="${currentPage + 1}"></strong> sur <strong th:text="${totalPages}"></strong></p>
+    </div>
+    
+    <!-- Tableau des produits -->
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    <a th:href="@{/(recherche=${recherche}, typeThe=${typeTheFiltre}, 
+                                    sortBy='id', direction=${sortBy == 'id' and direction == 'asc' ? 'desc' : 'asc'},
+                                    page=${currentPage}, size=${pageSize})}">
+                        ID
+                        <span th:if="${sortBy == 'id'}" th:text="${direction == 'asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/(recherche=${recherche}, typeThe=${typeTheFiltre}, 
+                                    sortBy='nom', direction=${sortBy == 'nom' and direction == 'asc' ? 'desc' : 'asc'},
+                                    page=${currentPage}, size=${pageSize})}">
+                        Nom
+                        <span th:if="${sortBy == 'nom'}" th:text="${direction == 'asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+                <th>Type</th>
+                <th>Origine</th>
+                <th>
+                    <a th:href="@{/(recherche=${recherche}, typeThe=${typeTheFiltre}, 
+                                    sortBy='prix', direction=${sortBy == 'prix' and direction == 'asc' ? 'desc' : 'asc'},
+                                    page=${currentPage}, size=${pageSize})}">
+                        Prix (€)
+                        <span th:if="${sortBy == 'prix'}" th:text="${direction == 'asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/(recherche=${recherche}, typeThe=${typeTheFiltre}, 
+                                    sortBy='quantiteStock', direction=${sortBy == 'quantiteStock' and direction == 'asc' ? 'desc' : 'asc'},
+                                    page=${currentPage}, size=${pageSize})}">
+                        Stock
+                        <span th:if="${sortBy == 'quantiteStock'}" th:text="${direction == 'asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+                <th>Description</th>
+                <th>Date Réception</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(produits)}">
+                <td colspan="9" style="text-align: center;">Aucun produit trouvé</td>
+            </tr>
+            <tr th:each="produit : ${produits}">
+                <td th:text="${produit.id}"></td>
+                <td th:text="${produit.nom}"></td>
+                <td th:text="${produit.typeThe}"></td>
+                <td th:text="${produit.origine}"></td>
+                <td th:text="${#numbers.formatDecimal(produit.prix, 1, 2)}"></td>
+                <td th:text="${produit.quantiteStock}"></td>
+                <td th:text="${produit.description}"></td>
+                <td th:text="${#temporals.format(produit.dateReception, 'dd/MM/yyyy')}"></td>
+                <td>
+                    <a th:href="@{/modifier/{id}(id=${produit.id})}" class="btn btn-warning">Modifier</a>
+                    <a th:href="@{/supprimer/{id}(id=${produit.id})}" 
+                       class="btn btn-danger"
+                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+                        Supprimer
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    <div class="pagination" th:if="${totalPages > 1}">
+        <!-- Premier -->
+        <a th:if="${currentPage > 0}" 
+           th:href="@{/(recherche=${recherche}, typeThe=${typeTheFiltre}, 
+                       sortBy=${sortBy}, direction=${direction}, page=0, size=${pageSize})}">
+            Première
+        </a>
+        
+        <!-- Précédent -->
+        <a th:if="${currentPage > 0}" 
+           th:href="@{/(recherche=${recherche}, typeThe=${typeTheFiltre}, 
+                       sortBy=${sortBy}, direction=${direction}, page=${currentPage - 1}, size=${pageSize})}">
+            Précédent
+        </a>
+        
+        <!-- Numéros de page -->
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+              th:if="${i >= currentPage - 2 and i <= currentPage + 2}">
+            <a th:if="${i != currentPage}" 
+               th:href="@{/(recherche=${recherche}, typeThe=${typeTheFiltre}, 
+                           sortBy=${sortBy}, direction=${direction}, page=${i}, size=${pageSize})}"
+               th:text="${i + 1}"></a>
+            <span th:if="${i == currentPage}" class="active" th:text="${i + 1}"></span>
+        </span>
+        
+        <!-- Suivant -->
+        <a th:if="${currentPage < totalPages - 1}" 
+           th:href="@{/(recherche=${recherche}, typeThe=${typeTheFiltre}, 
+                       sortBy=${sortBy}, direction=${direction}, page=${currentPage + 1}, size=${pageSize})}">
+            Suivant
+        </a>
+        
+        <!-- Dernier -->
+        <a th:if="${currentPage < totalPages - 1}" 
+           th:href="@{/(recherche=${recherche}, typeThe=${typeTheFiltre}, 
+                       sortBy=${sortBy}, direction=${direction}, page=${totalPages - 1}, size=${pageSize})}">
+            Dernière
+        </a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titre}">Formulaire Produit</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Georgia', 'Times New Roman', serif; 
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8dfd0 100%);
+            padding: 20px; 
+            color: #4a3c2e; 
+        }
+        .container { 
+            max-width: 700px; 
+            margin: 0 auto; 
+            background: #fefdfb; 
+            padding: 42px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(93, 78, 55, 0.15);
+            border: 1px solid #d4c4a8;
+        }
+        h1 { 
+            color: #5d4e37; 
+            margin-bottom: 32px; 
+            font-size: 1.9em;
+            font-weight: 400;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #8b7355;
+            padding-bottom: 12px;
+        }
+        .form-group { margin-bottom: 22px; }
+        label { 
+            display: block; 
+            margin-bottom: 9px; 
+            font-weight: 600; 
+            color: #5d4e37;
+            font-size: 15px;
+            font-family: system-ui, sans-serif;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #d4c4a8; 
+            border-radius: 5px; 
+            font-size: 14px;
+            background: #fefdfb;
+            font-family: system-ui, sans-serif;
+            color: #4a3c2e;
+        }
+        input:focus, select:focus, textarea:focus { 
+            outline: none; 
+            border-color: #8b7355; 
+            box-shadow: 0 0 0 4px rgba(139, 115, 85, 0.1);
+        }
+        textarea { resize: vertical; min-height: 110px; }
+        .error { 
+            color: #b8705e; 
+            font-size: 13px; 
+            margin-top: 6px;
+            font-family: system-ui, sans-serif;
+        }
+        .btn { 
+            padding: 13px 26px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            transition: all 0.3s; 
+            margin-right: 12px; 
+            text-decoration: none; 
+            display: inline-block;
+            font-family: system-ui, sans-serif;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-primary { background: #6b5d4f; color: white; }
+        .btn-primary:hover { background: #5d4e37; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .btn-secondary { background: #a89885; color: white; }
+        .btn-secondary:hover { background: #988875; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${titre}">Formulaire Produit</h1>
+    
+    <form th:action="${produit.id != null ? '/modifier/' + produit.id : '/enregistrer'}" 
+          method="post" 
+          th:object="${produit}">
+        
+        <!-- Nom -->
+        <div class="form-group">
+            <label for="nom">Nom du thé *</label>
+            <input type="text" id="nom" th:field="*{nom}" required maxlength="100" />
+            <div class="error" th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}"></div>
+        </div>
+        
+        <!-- Type de thé -->
+        <div class="form-group">
+            <label for="typeThe">Type de thé *</label>
+            <select id="typeThe" th:field="*{typeThe}" required>
+                <option value="">-- Sélectionnez un type --</option>
+                <option th:each="type : ${typesThe}" 
+                        th:value="${type}" 
+                        th:text="${type}"></option>
+            </select>
+            <div class="error" th:if="${#fields.hasErrors('typeThe')}" th:errors="*{typeThe}"></div>
+        </div>
+        
+        <!-- Origine -->
+        <div class="form-group">
+            <label for="origine">Origine *</label>
+            <select id="origine" th:field="*{origine}" required>
+                <option value="">-- Sélectionnez une origine --</option>
+                <option th:each="origine : ${origines}" 
+                        th:value="${origine}" 
+                        th:text="${origine}"></option>
+            </select>
+            <div class="error" th:if="${#fields.hasErrors('origine')}" th:errors="*{origine}"></div>
+        </div>
+        
+        <!-- Prix -->
+        <div class="form-group">
+            <label for="prix">Prix (€) *</label>
+            <input type="number" id="prix" th:field="*{prix}" 
+                   min="5" max="100" step="0.01" required />
+            <div class="error" th:if="${#fields.hasErrors('prix')}" th:errors="*{prix}"></div>
+        </div>
+        
+        <!-- Quantité en stock -->
+        <div class="form-group">
+            <label for="quantiteStock">Quantité en stock *</label>
+            <input type="number" id="quantiteStock" th:field="*{quantiteStock}" 
+                   min="0" required />
+            <div class="error" th:if="${#fields.hasErrors('quantiteStock')}" th:errors="*{quantiteStock}"></div>
+        </div>
+        
+        <!-- Description -->
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" th:field="*{description}" 
+                      maxlength="500"></textarea>
+            <div class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+        </div>
+        
+        <!-- Date de réception -->
+        <div class="form-group">
+            <label for="dateReception">Date de réception *</label>
+            <input type="date" id="dateReception" th:field="*{dateReception}" required />
+            <div class="error" th:if="${#fields.hasErrors('dateReception')}" th:errors="*{dateReception}"></div>
+        </div>
+        
+        <!-- Boutons -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="/" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>
